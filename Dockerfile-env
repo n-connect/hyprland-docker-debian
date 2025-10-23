@@ -15,7 +15,7 @@
 
 FROM debian:testing
 
-# enable experimental for g++15
+# enable experimental for g++15 binutils binutils 
 COPY ./experimental.sources /etc/apt/sources.list.d/experimental.sources
 
 RUN apt update && \

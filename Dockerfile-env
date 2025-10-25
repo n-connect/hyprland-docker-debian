@@ -94,11 +94,13 @@ RUN	git clone https://github.com/hyprwm/hyprgraphics && \
 
 RUN 	cd /tmp/;git clone --recursive https://github.com/hyprwm/Hyprland && \
 	cd Hyprland && git checkout v0.50.1 && \
-#	sed -i 's+/bin/sh+/bin/env+g' src/xwayland/Server.cpp && \
-#	sed -i 's+"-c"+"-S"+g' src/xwayland/Server.cpp && \
-#	sed -i 's+/bin/sh+/bin/env+g' src/managers/KeybindManager.cpp && \
-#	sed -i 's+"-c"+"-S"+g' src/managers/KeybindManager.cpp && \
-	sed -i 's|"/bin/sh", "/bin/sh", "-c"|"/bin/env", "/bin/env", "-S"|g' src/xwayland/Server.cpp && \
+	sed -i '' '/if ((buf.st_uid != 0) && (buf.st_uid != getuid())) {/,/}/c\
+#	Quick and dirty mod to let XWayland start in Debian with GDM3 (service run by Debian-)
+	if ((buf.st_uid != 0) && (buf.st_uid != getuid())) {\
+        Debug::log(ERR, "X11 socket dir is not owned by root or current user, ut moving on...");\
+        return true;\
+    }' src/xwayland/Server.cpp && \
+#	sed -i 's|"/bin/sh", "/bin/sh", "-c"|"/bin/env", "/bin/env", "-S"|g' src/xwayland/Server.cpp && \
 	sed -i 's|"/bin/sh", "/bin/sh", "-c"|"/bin/env", "/bin/env", "-S"|g' src/managers/KeybindManager.cpp && \
 	make all && make install && \
 	tar -czvf /tmp/Hyprland_v0.51.1.tar.gz -T build/install_manifest.txt
